@@ -1,5 +1,7 @@
 import { defineConfig } from '@playwright/test';
 import env from './config/env';
+import { PlaywrightReportEmail } from '@playwright-labs/reporter-email/templates/base';
+import React from 'react';
 
 /**
  * This config is used exclusively by `npx playwright merge-reports`
@@ -18,8 +20,10 @@ export default defineConfig({
 				auth: { user: env.SMTP_USERNAME, pass: env.SMTP_PASSWORD },
 				from: env.SMTP_USERNAME,
 				to: ['amartanwar93@gmail.com'],
-				subject: 'OrangeHRM Web App Test Report',
-				template: 'shadcn',
+				subject: (result: any) =>
+					`[OrangeHRM Web App Test Report] ${result.status.toUpperCase()} — ${new Date().toLocaleDateString()}`,
+				html: (result: any, testCases: any) =>
+					React.createElement(PlaywrightReportEmail, { result, testCases }),
 				send: 'always',
 			},
 		],

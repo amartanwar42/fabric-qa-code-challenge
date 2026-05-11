@@ -84,6 +84,11 @@ class DashboardPageObject {
 			employmentStatusOptions: (option: string) => this.page.getByText(option),
 		},
 	};
+
+	profile = {
+		profileIcon: () => this.page.locator('img[alt="profile picture"]'),
+		logoutButton: () => this.page.getByText('Logout'),
+	};
 }
 
 export default DashboardPageObject;

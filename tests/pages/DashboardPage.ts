@@ -134,9 +134,17 @@ class DashboardPage extends BasePage {
 			);
 		},
 
-		verifyEmployeeCreatedSuccessMessage: async () => {
-			logger.info(`Verifying success message after creating employee`);
+		verifyEmployeeCreatedSuccess: async () => {
+			logger.info(`Verifying success of creating employee`);
+			const responsePromise = this.page.waitForResponse(
+				(response) =>
+					response.url().includes('/api/v2/pim/employees') &&
+					response.request().method() === 'POST' &&
+					response.status() === 200,
+			);
 			await this.verifyMessageVisible('Successfully Saved');
+			await responsePromise;
+			logger.info(`Verified success of creating employee`);
 		},
 
 		searchEmployee: async (searchCriteria: {
@@ -149,7 +157,13 @@ class DashboardPage extends BasePage {
 			await this.actions.click(
 				this.dashboardPageObject.PIMTab.search.employeeList(),
 			);
-			await this.actions.waitForTimeout(5000); // Wait for page to load
+
+			await this.page.waitForResponse(
+				(response) =>
+					response.url().includes('api/v2/pim/employees?limit=50') &&
+					response.request().method() === 'GET' &&
+					response.status() === 200,
+			);
 
 			if (searchCriteria.employeeId) {
 				await this.actions.fill(
@@ -163,7 +177,7 @@ class DashboardPage extends BasePage {
 					searchCriteria.employeeName,
 				);
 			}
-			await this.actions.waitForTimeout(5000); // Wait for search results to load
+			await this.actions.waitForTimeout(2000); // Wait for search results to load
 			await this.clickButton('Search');
 		},
 
@@ -215,7 +229,11 @@ class DashboardPage extends BasePage {
 				| 'Automation Tester'
 				| 'Account Assistant'
 				| 'Content Specialist';
-			jobCategory?: 'Craft Workers' | 'Operatives' | 'Officials Managers';
+			jobCategory?:
+				| 'Craft Workers'
+				| 'Operatives'
+				| 'Officials Managers'
+				| 'Test Engineer';
 			employmentStatus?:
 				| 'Freelance'
 				| 'Part-Time Permanent'
@@ -261,6 +279,20 @@ class DashboardPage extends BasePage {
 			await this.clickButton('Save');
 			await this.verifyMessageVisible('Successfully Updated');
 			logger.info(`Edited the employee details`);
+		},
+	};
+
+	profile = {
+		openProfileMenu: async () => {
+			logger.info('Opening profile menu');
+			await this.actions.click(this.dashboardPageObject.profile.profileIcon());
+		},
+
+		logout: async () => {
+			logger.info('Logging out from the application');
+			await this.profile.openProfileMenu();
+			await this.actions.click(this.dashboardPageObject.profile.logoutButton());
+			logger.info('Clicked on logout button');
 		},
 	};
 }
