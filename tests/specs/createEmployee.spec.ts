@@ -82,7 +82,7 @@ test.describe.serial('Create Employee Tests', () => {
 		// Verify updated employee details
 		const dashboardPageObject = new DashboardPageObject(sharedPage);
 		await sharedPage.reload(); // Reload the page to reflect the updated details
-		await sharedPage.waitForTimeout(2000); // Wait for the page to reload and reflect the updated details
+		await sharedPage.waitForTimeout(5000); // Wait for the page to reload and reflect the updated details
 
 		let jobTitle = await dashboardPage.actions.getText(
 			dashboardPageObject.PIMTab.editPatient.jobTitleDropdown(),

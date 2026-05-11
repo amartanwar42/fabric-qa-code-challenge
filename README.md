@@ -183,3 +183,27 @@ Tests run automatically on GitHub Actions for every push and pull request to `ma
 ### Only-Changed Tests on PR
 
 The workflow uses Playwright's `--only-changed` flag to run only tests affected by the PR diff. This reduces CI time by skipping unrelated tests. Full history (`fetch-depth: 0`) is required for git diff comparison.
+
+### Sharding (Parallel CI Runs)
+
+Tests are split across **2 shards** (kept at 2 for demo purposes) that run in parallel as separate GitHub Actions jobs. This cuts CI time roughly in half.
+
+- Each shard runs with `--shard=x/2` and uploads a blob report
+- After all shards complete, a `merge-reports` job downloads all blob reports and merges them into a single HTML report
+- The merged report is uploaded as an artifact (retained for 14 days)
+
+To increase parallelism, update the `shardIndex` and `shardTotal` values in the workflow matrix:
+
+```yaml
+matrix:
+  shardIndex: [1, 2, 3, 4] # increase shards here
+  shardTotal: [4]
+```
+
+### GitHub Pages Report
+
+After each run, the merged HTML report is automatically deployed to GitHub Pages. View the latest report at:
+
+```
+https://amartanwar42.github.io/fabric-qa-code-challenge/
+```
