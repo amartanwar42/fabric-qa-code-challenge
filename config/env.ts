@@ -40,6 +40,10 @@ const env = {
 	LOG_LEVEL: getOptional('LOG_LEVEL', 'info'),
 	ENABLE_CONSOLE_LOG: getBoolean('ENABLE_CONSOLE_LOG', false),
 	CI: getBoolean('CI', false),
+
+	// Email Reporter
+	SMTP_USERNAME: getOptional('SMTP_USERNAME', ''),
+	SMTP_PASSWORD: getOptional('SMTP_PASSWORD', ''),
 };
 
 export default env;

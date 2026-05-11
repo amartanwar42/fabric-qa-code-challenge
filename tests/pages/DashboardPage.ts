@@ -149,6 +149,8 @@ class DashboardPage extends BasePage {
 			await this.actions.click(
 				this.dashboardPageObject.PIMTab.search.employeeList(),
 			);
+			await this.actions.waitForTimeout(4000); // Wait for page to load
+
 			if (searchCriteria.employeeId) {
 				await this.actions.fill(
 					this.dashboardPageObject.PIMTab.search.employeeId(),
