@@ -82,7 +82,7 @@ test.describe.serial('Create Employee Tests', () => {
 		expect(employmentStatus).toBe('Freelance');
 	});
 
-	test('verify the API response', async ({ apiHelper }) => {
+	test('verify the search api response', async ({ apiHelper }) => {
 		//check the created employee details in API response
 		let employees = await apiHelper.searchEmployees();
 

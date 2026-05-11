@@ -1,10 +1,8 @@
-import { expect, test } from '../fixtures/testFixture';
+import { test } from '../fixtures/testFixture';
 import env from '../../config/env';
-import testData from '../utility/testDataGenerator';
-import DashboardPageObject from '../pageObjects/DashboardPageObject';
 
 test.describe.serial('Login logout and navigation Tests', () => {
-	test('Verify login with valid credentials', async ({ loginPage }) => {
+	test('verify login with valid credentials', async ({ loginPage }) => {
 		// Step 1: Open the OrangeHRM application.
 		await loginPage.openLoginPage();
 

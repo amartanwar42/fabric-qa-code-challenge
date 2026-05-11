@@ -27,12 +27,13 @@ tests/
 
 ## Libraries Used
 
-| Library            | Purpose                                               |
-| ------------------ | ----------------------------------------------------- |
-| `@playwright/test` | Test runner, browser automation, assertions           |
-| `dotenv`           | Loads environment variables from `.env`               |
-| `winston`          | Structured logging to file and console                |
-| `@faker-js/faker`  | Random test data generation (names, IDs, credentials) |
+| Library                           | Purpose                                               |
+| --------------------------------- | ----------------------------------------------------- |
+| `@playwright/test`                | Test runner, browser automation, assertions           |
+| `dotenv`                          | Loads environment variables from `.env`               |
+| `winston`                         | Structured logging to file and console                |
+| `@faker-js/faker`                 | Random test data generation (names, IDs, credentials) |
+| `@playwright-labs/reporter-email` | Sends test report emails after CI runs                |
 
 ## Fixtures
 
@@ -46,6 +47,7 @@ Custom fixtures are defined in `tests/fixtures/testFixture.ts` and extend Playwr
 | `saveScreenshot` | Test (auto) | Automatically takes and attaches a screenshot on test failure                              |
 | `loginPage`      | Test        | Pre-initialized `LoginPage` instance                                                       |
 | `dashboardPage`  | Test        | Pre-initialized `DashboardPage` instance                                                   |
+| `apiHelper`      | Test        | API utility using the authenticated browser context for REST calls                         |
 
 Usage in specs:
 
@@ -83,6 +85,8 @@ ADMIN_USERNAME=****
 ADMIN_PASSWORD=****
 ENABLE_CONSOLE_LOG=true
 LOG_LEVEL=info
+SMTP_USERNAME=****
+SMTP_PASSWORD=****
 ```
 
 | Variable             | Required | Values                           | Default |
@@ -93,6 +97,8 @@ LOG_LEVEL=info
 | `ENABLE_CONSOLE_LOG` | No       | `true`, `false`                  | `false` |
 | `LOG_LEVEL`          | No       | `info`, `debug`, `warn`, `error` | `info`  |
 | `CI`                 | No       | `true`, `false`                  | `false` |
+| `SMTP_USERNAME`      | No       | Gmail address for sending emails | —       |
+| `SMTP_PASSWORD`      | No       | Gmail app password               | —       |
 
 ## Running Tests
 
@@ -196,14 +202,28 @@ To increase parallelism, update the `shardIndex` and `shardTotal` values in the 
 
 ```yaml
 matrix:
-  shardIndex: [1, 2, 3, 4] # increase shards here
-  shardTotal: [4]
+  shardIndex: [1, 2] # increase shards here
+  shardTotal: [2] # update total shards accordingly
 ```
 
 ### GitHub Pages Report
 
-After each run, the merged HTML report is automatically deployed to GitHub Pages. View the latest report at:
+After each push to main/master, the merged HTML report is automatically deployed to GitHub Pages. View the latest report at:
 
 ```
 https://amartanwar42.github.io/fabric-qa-code-challenge/
 ```
+
+### Email Notifications
+
+After all shards complete and reports are merged, an email with the full test results is sent automatically using [`@playwright-labs/reporter-email`](https://github.com/vitalics/playwright-labs/tree/main/packages/reporter-email).
+
+- The email reporter runs during the `merge-reports` CI job (not per shard), so you receive **one consolidated email** with all test results
+- Uses Gmail SMTP with an [app password](https://myaccount.google.com/apppasswords) for authentication
+- The email template is rendered using React Email (shadcn-styled)
+- Configuration is in `merge-reports.config.ts`
+- To change the recipient, update the `to` array in `merge-reports.config.ts`.
+
+#### Sample Email
+
+![Email Notification Sample](emailNotification.png)
