@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
@@ -20,7 +22,12 @@ jobs:
       - name: Create .env file
         run: echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
       - name: Run Playwright tests
-        run: npx playwright test
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx playwright test --only-changed=origin/main
+          else
+            npx playwright test
+          fi
         env:
           CI: true
       - uses: actions/upload-artifact@v4

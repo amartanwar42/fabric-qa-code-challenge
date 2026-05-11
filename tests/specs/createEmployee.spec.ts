@@ -28,7 +28,7 @@ test.describe.serial('Create Employee Tests', () => {
 	});
 
 	// Step 3: Verify that the left-side navigation menu is displayed and functional.
-	test.skip('verify left-side navigation menu is displayed and functional', async ({
+	test('verify left-side navigation menu is displayed and functional', async ({
 		dashboardPage,
 	}) => {
 		await dashboardPage.openDashboard();

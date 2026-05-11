@@ -172,9 +172,14 @@ Tests run automatically on GitHub Actions for every push and pull request to `ma
 
 ### What the Workflow Does
 
-- Checks out the code
+- Checks out the code (with full git history for diff detection)
 - Installs Node.js and dependencies
 - Installs Playwright browsers
 - Decodes `ENV_FILE` secret into `.env`
-- Runs all tests with `CI=true` (enables retries, parallel workers, `forbidOnly`)
+- **On PR** — runs only affected tests using `--only-changed=origin/main`
+- **On push to main/master** — runs all tests
 - Uploads the HTML test report as an artifact (retained for 30 days)
+
+### Only-Changed Tests on PR
+
+The workflow uses Playwright's `--only-changed` flag to run only tests affected by the PR diff. This reduces CI time by skipping unrelated tests. Full history (`fetch-depth: 0`) is required for git diff comparison.
