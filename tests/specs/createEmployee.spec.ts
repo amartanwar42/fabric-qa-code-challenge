@@ -17,39 +17,12 @@ test.describe.serial('Create Employee Tests', () => {
 		password: testData.employee.password(),
 	};
 
-	test('Verify login with valid credentials', async ({ loginPage }) => {
-		// Step 1: Open the OrangeHRM application.
+	test('verify employee creation', async ({ dashboardPage, loginPage }) => {
+		//login to the application first
 		await loginPage.openLoginPage();
-
-		// Step 2: Log in to the application using valid credentials.
 		await loginPage.login(env.ADMIN_USERNAME, env.ADMIN_PASSWORD);
 
-		// Assertion to verify that login was successful by checking the presence of an element that is only visible after login
-		await loginPage.verifyLoginSuccessful();
-	});
-
-	// Step 3: Verify that the left-side navigation menu is displayed and functional.
-	test('verify left-side navigation menu is displayed and functional', async ({
-		dashboardPage,
-	}) => {
-		await dashboardPage.openDashboard();
-		// Step 3: Verify that the left-side navigation menu is displayed and functional.
-		await dashboardPage.openTab('Admin', '/ User Management');
-		await dashboardPage.openTab('PIM', 'PIM');
-		await dashboardPage.openTab('Leave', 'Leave');
-		await dashboardPage.openTab('Time', '/ Timesheets');
-		await dashboardPage.openTab('Recruitment', 'Recruitment');
-		await dashboardPage.openTab('My Info', 'PIM');
-		await dashboardPage.openTab('Performance', '/ Manage Reviews');
-		await dashboardPage.openTab('Directory', 'Directory');
-		await dashboardPage.openTab('Claim', 'Claim');
-		await dashboardPage.openTab('Buzz', 'Buzz');
-		await dashboardPage.openMaintenanceTab();
-	});
-
-	test('verify employee creation', async ({ dashboardPage }) => {
 		// Step 4. Navigate to PIM (Personnel Information Management) module.
-		await dashboardPage.openDashboard();
 		await dashboardPage.openTab('PIM', 'PIM');
 
 		// Step 5. Add a new employee with valid details and capture the Employee ID.
@@ -57,7 +30,7 @@ test.describe.serial('Create Employee Tests', () => {
 			employeeDetails,
 			employeeLoginDetails,
 		);
-		await dashboardPage.pimTab.verifyEmployeeCreatedSuccessMessage();
+		await dashboardPage.pimTab.verifyEmployeeCreatedSuccess();
 	});
 
 	test('verify employee in search results and edit employee details', async ({
@@ -82,7 +55,15 @@ test.describe.serial('Create Employee Tests', () => {
 		// Verify updated employee details
 		const dashboardPageObject = new DashboardPageObject(sharedPage);
 		await sharedPage.reload(); // Reload the page to reflect the updated details
-		await sharedPage.waitForTimeout(5000); // Wait for the page to reload and reflect the updated details
+
+		// Wait for the page to reload and reflect the updated details
+		await sharedPage.waitForResponse(
+			(response) =>
+				response.url().includes('api/v2/pim/employees/') &&
+				response.request().method() === 'GET' &&
+				response.status() === 200,
+		);
+		await sharedPage.waitForTimeout(2000);
 
 		let jobTitle = await dashboardPage.actions.getText(
 			dashboardPageObject.PIMTab.editPatient.jobTitleDropdown(),
@@ -99,5 +80,32 @@ test.describe.serial('Create Employee Tests', () => {
 		expect(jobTitle).toBe('Account Assistant');
 		expect(jobCategory).toBe('Craft Workers');
 		expect(employmentStatus).toBe('Freelance');
+	});
+
+	test('verify the API response', async ({ apiHelper }) => {
+		//check the created employee details in API response
+		let employees = await apiHelper.searchEmployees();
+
+		// Validate response structure
+		expect(employees).toHaveProperty('data');
+		expect(employees).toHaveProperty('meta');
+		expect(employees).toHaveProperty('rels');
+		expect(employees.meta).toHaveProperty('total');
+		expect(employees.meta.total).toBeGreaterThan(0);
+		expect(Array.isArray(employees.data)).toBe(true);
+
+		// Find and validate the created employee
+		const createdEmployee = employees.data.find(
+			(emp) => emp.employeeId === employeeDetails.employeeId,
+		);
+		expect(createdEmployee).toBeDefined();
+
+		// Validate employee fields
+		expect(createdEmployee?.firstName).toBe(employeeDetails.firstName);
+		expect(createdEmployee?.lastName).toBe(employeeDetails.lastName);
+		expect(createdEmployee?.middleName).toBe(employeeDetails.middleName);
+		expect(createdEmployee?.employeeId).toBe(employeeDetails.employeeId);
+		expect(createdEmployee?.jobTitle.title).toBe('Account Assistant');
+		expect(createdEmployee?.empStatus.name).toBe('Freelance');
 	});
 });

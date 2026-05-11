@@ -1,6 +1,7 @@
 import { test as base, BrowserContext, Page } from '@playwright/test';
 import LoginPage from '../pages/LoginPage.js';
 import DashboardPage from '../pages/DashboardPage.js';
+import { ApiHelper } from '../utility/apiHelper';
 import { logger } from '../utility/logger';
 
 interface TestFixtures {
@@ -9,6 +10,7 @@ interface TestFixtures {
 	sharedPage: Page;
 	sharedContext: BrowserContext;
 	saveScreenshot: void;
+	apiHelper: ApiHelper;
 }
 
 type WorkerFixtures = {
@@ -87,6 +89,10 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 	},
 	dashboardPage: async ({ sharedPage }, use) => {
 		await use(new DashboardPage(sharedPage));
+	},
+	apiHelper: async ({ sharedContext }, use) => {
+		const request = await sharedContext.request;
+		await use(new ApiHelper(request));
 	},
 });
 

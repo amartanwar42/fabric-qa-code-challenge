@@ -18,6 +18,11 @@ class LoginPage extends BasePage {
 		return this.actions.navigateTo('auth/login');
 	}
 
+	verifyLoginPageVisible() {
+		logger.info('Verifying that Login Page is visible');
+		return this.actions.waitForVisible(this.loginPageObject.loginButton);
+	}
+
 	async login(username: string, password: string) {
 		logger.info(`Attempting to log in with username: ${username}`);
 		await this.actions.fill(this.loginPageObject.usernameInput, username);
