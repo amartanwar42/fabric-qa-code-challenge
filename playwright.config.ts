@@ -1,9 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import env from './config/env';
 import config from './config/config';
-import { TestCase, TestResult } from '@playwright/test/reporter';
-import React from 'react';
-import { PlaywrightReportEmail } from '@playwright-labs/reporter-email/templates';
 console.log(`Running tests against: ${config.baseUrl} [ENV: ${env.ENV}]`);
 
 export default defineConfig({
@@ -18,27 +15,7 @@ export default defineConfig({
 	workers: process.env.CI ? 4 : undefined,
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
 	reporter: process.env.CI
-		? [
-				['blob'],
-				['list'],
-				['html', { title: 'OrangeHRM Web App Tests' }],
-				[
-					'@playwright-labs/reporter-email',
-					{
-						host: 'smtp.gmail.com',
-						port: 465,
-						secure: true,
-						auth: { user: env.SMTP_USERNAME, pass: env.SMTP_PASSWORD },
-						from: env.SMTP_USERNAME,
-						to: ['amartanwar93@gmail.com'],
-						subject: (result: TestResult) =>
-							`[OrangeHRM Web App Test Report] ${result.status.toUpperCase()} — ${new Date().toLocaleDateString()}`,
-						html: (result: any, testCases: any) =>
-							React.createElement(PlaywrightReportEmail, { result, testCases }),
-						send: 'always',
-					},
-				],
-			]
+		? [['blob'], ['list'], ['html', { title: 'OrangeHRM Web App Tests' }]]
 		: [['html', { title: 'OrangeHRM Web App Tests' }], ['list']],
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
