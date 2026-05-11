@@ -16,6 +16,7 @@ test.describe.serial('Create Employee Tests', () => {
 		username: testData.employee.username(),
 		password: testData.employee.password(),
 	};
+
 	test('Verify login with valid credentials', async ({ loginPage }) => {
 		// Step 1: Open the OrangeHRM application.
 		await loginPage.openLoginPage();
