@@ -149,7 +149,7 @@ class DashboardPage extends BasePage {
 			await this.actions.click(
 				this.dashboardPageObject.PIMTab.search.employeeList(),
 			);
-			await this.actions.waitForTimeout(4000); // Wait for page to load
+			await this.actions.waitForTimeout(5000); // Wait for page to load
 
 			if (searchCriteria.employeeId) {
 				await this.actions.fill(
@@ -163,7 +163,7 @@ class DashboardPage extends BasePage {
 					searchCriteria.employeeName,
 				);
 			}
-			await this.actions.waitForTimeout(2000); // Wait for search results to load
+			await this.actions.waitForTimeout(5000); // Wait for search results to load
 			await this.clickButton('Search');
 		},
 
