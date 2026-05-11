@@ -80,7 +80,7 @@ jobs:
           path: playwright-report
 
   deploy-report:
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && github.event_name == 'push' }}
     needs: [merge-reports]
     runs-on: ubuntu-latest
     environment:
